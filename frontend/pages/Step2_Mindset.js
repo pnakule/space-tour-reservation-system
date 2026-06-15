@@ -92,13 +92,12 @@ export function renderStep2() {
               id="whySpace"
               name="whySpace"
               rows="5"
-              maxlength="1000"
-              placeholder="Tell us your motivation for space travel (max 1000 characters)…"
+              maxlength="500"
               style="resize:vertical;min-height:120px"
             ></textarea>
             <div style="display:flex;justify-content:space-between;margin-top:6px">
               <span class="form-error" id="err-whyspace"></span>
-              <span class="form-hint" id="char-count" style="margin-left:auto">0 / 1000 characters</span>
+              <span class="form-hint" id="char-count" style="margin-left:auto">0 / 500 characters</span>
             </div>
           </div>
           <button class="btn btn-earth btn-full btn-lg" type="submit" id="btn-step2">
