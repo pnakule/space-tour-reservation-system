@@ -1,6 +1,6 @@
-// =====================================================
+// ====================================================
 //  Space Tour — App Router & State Manager
-// =====================================================
+// ====================================================
  
 import { renderLanding }       from './pages/Landing.js';
 import { renderExplore, initExplore } from './pages/Explore.js';
