@@ -1,4 +1,4 @@
-// =====================================================
+// ====================================================
 //  API Service — AWS API Gateway + Lambda
 //  Set DEMO_MODE = false + fill API_BASE for production
 //
@@ -16,7 +16,7 @@
 //  If the user abandons the flow before Step 5,
 //  /confirm-reservation is never called and nothing is
 //  ever persisted.
-// =====================================================
+// ====================================================
 
 const API_BASE   = 'https://l3nbabfv8c.execute-api.us-east-1.amazonaws.com/prod';
 const DEMO_MODE  = false;
