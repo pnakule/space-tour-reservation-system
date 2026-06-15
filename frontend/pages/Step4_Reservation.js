@@ -1,6 +1,6 @@
-// ====================================================
+// =====================================================
 //  Step 4 — Reservation 
-// ====================================================
+// =====================================================
 import { API }      from '../services/api.js';
 import { navigate, State } from '../app.js';
 import { toast }    from '../components/Toast.js';
@@ -86,7 +86,63 @@ export function renderStep4() {
       </div>
 
       <!-- Visual -->
-      <div class="summary-visual ${exp.visual}"><div class="fare-orb"></div></div>
+      <!-- Visual -->
+<div class="summary-visual ${exp.visual}">
+  <div class="fare-orb"></div>
+
+  <div style="position:absolute;top:14px;left:14px">
+    <span style="
+      font-family:var(--font-mono);
+      font-size:0.62rem;
+      letter-spacing:0.1em;
+      text-transform:uppercase;
+      color:#fff;
+      background:rgba(7,11,22,0.55);
+      border-radius:9999px;
+      padding:4px 12px;
+      border:1px solid rgba(255,255,255,0.2)
+    ">
+      ${exp.name}
+    </span>
+  </div>
+
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(7,11,22,0.92) 0%,transparent 60%)"></div>
+
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:18px 22px">
+    <div style="
+      font-family:var(--font-mono);
+      font-size:0.65rem;
+      letter-spacing:0.1em;
+      text-transform:uppercase;
+      color:${exp.key === 'lunar-flyby'
+        ? 'var(--ochre-light)'
+        : 'var(--terra-light)'
+      };
+      margin-bottom:4px;
+    ">${exp.key === 'lunar-flyby'
+  ? 'ultra Premium Experience'
+  : 'Earth Orbit'
+}
+    </div>
+
+    <div style="
+      font-family:var(--font-display);
+      font-size:1.3rem;
+      font-weight:800;
+      color:#eef2f9;
+    ">
+      ${exp.spacecraft}
+    </div>
+
+    <div style="
+      font-size:0.82rem;
+      color:#93a0b8;
+      margin-top:2px;
+    ">
+      ${exp.destination}
+    </div>
+  </div>
+</div>
 
       <!-- Traveler card -->
       <div class="card" style="margin-bottom:20px">
@@ -176,3 +232,4 @@ function setLoading(btn, on) {
   if (on)  { btn._orig = btn.innerHTML; btn.innerHTML = `<div class="spinner"></div> Confirming…`; btn.disabled = true; }
   else     { btn.innerHTML = btn._orig || 'Confirm Reservation'; btn.disabled = false; }
 }
+
