@@ -1,6 +1,6 @@
-// =====================================================
+// ==============================================
 //  Step 1 — Traveler Information  (backend logic- verify naem email)
-// =====================================================
+// =================================================
 import { API }      from '../services/api.js';
 import { navigate } from '../app.js';
 import { toast }    from '../components/Toast.js';
