@@ -479,7 +479,7 @@ export function renderExplore() {
           <div class="xp-logo-ring"></div>
           Space Tour
         </div>
-        <p class="xp-footer-note">© Space Tour · Space Exploration Reference</p>
+        <p class="xp-footer-note">© Space Tour · Space Tourism</p>
       </footer>
     </div>
   `;
