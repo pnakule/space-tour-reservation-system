@@ -1,6 +1,6 @@
-// ====================================================
+// =====================================================
 //  Step 2 — Mindset (no backend logic)
-// ====================================================
+// =====================================================
 import { navigate, State } from '../app.js';
 import { toast }    from '../components/Toast.js';
 export function renderStep2() {
@@ -122,17 +122,17 @@ export function attachStep2Listeners() {
       clearError(`err-${group}`);
     });
   });
-  // Character count (max 1000)
+  // Character count (max 500)
   const textarea = document.getElementById('whySpace');
   const ccEl = document.getElementById('char-count');
   textarea?.addEventListener('input', () => {
-    if (textarea.value.length > 1000) {
-      textarea.value = textarea.value.slice(0, 1000);
+    if (textarea.value.length > 500) {
+      textarea.value = textarea.value.slice(0, 500);
     }
     const chars = textarea.value.length;
     if (ccEl) {
-      ccEl.textContent = `${chars} / 1000 characters`;
-      ccEl.style.color = chars >= 1000 ? 'var(--error)' : 'var(--dim)';
+      ccEl.textContent = `${chars} / 500 characters`;
+      ccEl.style.color = chars >= 500 ? 'var(--error)' : 'var(--dim)';
     }
   });
   document.getElementById('form-step2')?.addEventListener('submit', (e) => {
@@ -148,8 +148,8 @@ export function attachStep2Listeners() {
     if (!resilient)   { setError('err-resilient',   'Please select an option.'); ok = false; }
     if (!whySpace) {
       setError('err-whyspace', 'Please share at least a few words about your motivation.'); ok = false;
-    } else if (whySpace.length > 1000) {
-      setError('err-whyspace', 'Please keep your answer to 1000 characters or less.'); ok = false;
+    } else if (whySpace.length > 500) {
+      setError('err-whyspace', 'Please keep your answer to 500 characters or less.'); ok = false;
     }
     // Risk acknowledgement — must be "Yes, I acknowledge" to proceed.
     if (acknowledgeRisk !== 'yes') {
