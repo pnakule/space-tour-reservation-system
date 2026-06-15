@@ -1,6 +1,7 @@
-// ====================================================
+
+// =====================================================
 //  Step 3 — Experience Selection
-// ====================================================
+// =====================================================
 import { navigate, State } from '../app.js';
 
 const EXPERIENCES = {
@@ -141,7 +142,7 @@ export function renderStep3() {
       </div>
 
       <button class="btn btn-earth btn-full btn-lg" id="btn-step3">
-        Continue to Reservation Summary
+        Continue
       </button>
     </div>
   `;
@@ -163,7 +164,7 @@ function buildDetailCard(exp, key) {
         <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(7,11,22,0.92) 0%,transparent 60%)"></div>
         <div style="position:absolute;bottom:0;left:0;right:0;padding:20px 24px 16px">
           <div style="font-family:var(--font-mono);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:${isPremium ? 'var(--ochre-light)' : 'var(--terra-light)'};margin-bottom:4px">
-            ${isPremium ? '⭐ Ultra Premium Experience' : 'Space Tourism'}
+            ${isPremium ? '⭐ Ultra Premium Experience' : 'Earth'}
           </div>
           <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:#eef2f9">${exp.spacecraft}</div>
           <div style="font-size:0.82rem;color:#93a0b8;margin-top:2px">Operated by Space Tour</div>
