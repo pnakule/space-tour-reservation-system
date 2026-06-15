@@ -1,4 +1,4 @@
-// ====================================================
+// =====================================================
 //  API Service — AWS API Gateway + Lambda
 //  Set DEMO_MODE = false + fill API_BASE for production
 //
@@ -16,7 +16,7 @@
 //  If the user abandons the flow before Step 5,
 //  /confirm-reservation is never called and nothing is
 //  ever persisted.
-// ====================================================
+// =====================================================
 
 const API_BASE   = 'https://l3nbabfv8c.execute-api.us-east-1.amazonaws.com/prod';
 const DEMO_MODE  = false;
@@ -60,7 +60,7 @@ function mockResponse(path, body) {
 
     // Read-only uniqueness pre-check against confirmed reservations
     if (confirmedReservations.has(email.trim().toLowerCase())) {
-      return Promise.resolve({ valid: false, field: 'email', message: 'A reservation with this email already exists.' });
+      return Promise.resolve({ valid: false, field: 'email', message: 'A reservation with this email already exists.Use different email address.' });
     }
 
     return Promise.resolve({ valid: true });
@@ -89,7 +89,7 @@ function mockResponse(path, body) {
     if (confirmedReservations.has(email)) {
       return Promise.resolve({
         success: false,
-        message: 'A reservation with this email already exists. Contact support if this is an error.',
+        message: 'A reservation with this email already exists. Use different email address.',
       });
     }
 
