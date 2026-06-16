@@ -1,6 +1,6 @@
-// ==============================================
+// =====================================================
 //  Step 1 — Traveler Information  (backend logic- verify naem email)
-// =================================================
+// =====================================================
 import { API }      from '../services/api.js';
 import { navigate } from '../app.js';
 import { toast }    from '../components/Toast.js';
@@ -84,8 +84,8 @@ export function attachStep1Listeners() {
     const terms     = document.getElementById('terms')?.checked;
 
     let ok = true;
-    if (!firstName || firstName.length < 1) { setError('firstName', 'First name must be at least 1 characters.'); ok = false; }
-    if (!lastName  || lastName.length < 1)  { setError('lastName',  'Last name must be at least 1 characters.');  ok = false; }
+    if (!firstName || firstName.length < 1) { setError('firstName', 'First name must be at least 2 characters.'); ok = false; }
+    if (!lastName  || lastName.length < 1)  { setError('lastName',  'Last name must be at least 2 characters.');  ok = false; }
     if (!isValidEmail(email))               { setError('email',     'Enter a valid email address.');               ok = false; }
     if (!terms)                             { setError('terms',     'You must accept the Terms and Conditions.');  ok = false; }
     if (!ok) return;

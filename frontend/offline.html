@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Space Tour — Maintenance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --gold:       #f0d9ae;
+      --gold-dim:   rgba(226,197,148,0.12);
+      --gold-line:  rgba(226,197,148,0.28);
+      --ink:        #f5f8ff;
+      --muted:      rgba(196,208,232,0.88);
+      --dim:        rgba(158,172,206,0.90);
+      --panel:      rgba(4,6,18,0.80);
+      --panel-line: rgba(226,197,148,0.16);
+    }
+
+    html, body {
+      height: 100%; width: 100%;
+      overflow: hidden;           /* NO SCROLL */
+      margin: 0; padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: #000;
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ══ CANVAS — full background scene ═══════════════════ */
+    #scene {
+      position: fixed; inset: 0; z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ══ PAGE — centred, no scroll ════════════════════════ */
+    .page {
+      position: fixed; inset: 0; z-index: 10;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 22px; padding: 24px;
+    }
+
+    /* ── Logo ── */
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-ring {
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 2px solid rgba(74,144,226,.85);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 14px rgba(74,144,226,.28);
+    }
+    .logo-ring::after {
+      content: ''; width: 7px; height: 7px; border-radius: 50%;
+      background: #4a90e2; box-shadow: 0 0 7px rgba(74,144,226,.9);
+    }
+    .logo-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.1rem; font-weight: 800; color: var(--ink); letter-spacing: 0.03em;
+    }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.22em; text-transform: uppercase;
+      color: rgba(226,197,148,.85); background: var(--gold-dim);
+      border: 1px solid var(--gold-line); border-radius: 9999px; padding: 5px 16px;
+    }
+    .badge-dot {
+      width: 6px; height: 6px; border-radius: 50%; background: var(--gold);
+      animation: pulse-gold 2s ease-in-out infinite;
+    }
+    @keyframes pulse-gold {
+      0%,100% { opacity:1; transform:scale(1); }
+      50%      { opacity:.2; transform:scale(.65); }
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--panel-line);
+      border-radius: 20px; padding: 36px 42px; text-align: center;
+      width: 100%; max-width: 440px;
+      backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+      position: relative; overflow: hidden;
+      box-shadow: 0 24px 70px -20px rgba(0,0,0,.9), 0 0 0 1px rgba(255,255,255,.025) inset;
+    }
+    .card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(226,197,148,.45), transparent);
+    }
+
+    .maintenance-icon {
+      width: 52px; height: 52px; margin: 0 auto 18px;
+      border-radius: 50%;
+      background: rgba(226,197,148,.07);
+      border: 1px solid rgba(226,197,148,.18);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      animation: icon-float 4s ease-in-out infinite;
+    }
+    @keyframes icon-float {
+      0%,100% { transform: translateY(0); }
+      50%      { transform: translateY(-5px); }
+    }
+
+    .card-heading {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.25rem, 3.5vw, 1.65rem);
+      color: var(--ink); margin-bottom: 7px;
+      letter-spacing: -0.01em; line-height: 1.2;
+    }
+    .card-sub {
+      font-family: 'Space Mono', monospace; font-size: 0.68rem;
+      letter-spacing: .14em; color: var(--dim); margin-bottom: 18px;
+      text-transform: uppercase;
+    }
+    .card-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-line), transparent);
+      margin: 16px 0;
+    }
+
+    .soon-row {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .blink-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--gold); flex-shrink: 0;
+      animation: blink-pulse 1.3s ease-in-out infinite;
+    }
+    @keyframes blink-pulse {
+      0%,100% { opacity:1; box-shadow: 0 0 0 0 rgba(240,217,174,.5); }
+      50%      { opacity:.2; box-shadow: 0 0 0 5px rgba(240,217,174,0); }
+    }
+    .soon-text {
+      font-family: 'Space Mono', monospace; font-size: 0.68rem;
+      letter-spacing: .18em; text-transform: uppercase;
+      color: var(--gold); font-weight: 700;
+    }
+
+    .card-body {
+      font-size: 0.84rem; line-height: 1.8;
+      color: var(--muted); font-weight: 300;
+      margin-bottom: 22px;
+    }
+
+    /* ── Explore button ── */
+    .explore-btn {
+      display: inline-flex; align-items: center; gap: 9px;
+      padding: 12px 28px;
+      background: rgba(74,120,226,0.15);
+      border: 1px solid rgba(100,140,255,0.36);
+      color: #b8c8ff;
+      font-family: 'Inter', sans-serif; font-size: 0.86rem; font-weight: 600;
+      border-radius: 11px; cursor: pointer; text-decoration: none;
+      transition: all .22s ease;
+      box-shadow: 0 4px 20px -6px rgba(74,120,226,.25);
+    }
+    .explore-btn:hover {
+      background: rgba(74,120,226,0.26);
+      border-color: rgba(120,160,255,0.62);
+      color: #d0dcff;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px -8px rgba(74,120,226,.42);
+    }
+    .explore-btn:active { transform: translateY(0); }
+
+    .footer-note {
+      font-family: 'Space Mono', monospace; font-size: 0.52rem;
+      letter-spacing: .16em; text-transform: uppercase;
+      color: rgba(100,113,150,.32); text-align: center;
+    }
+
+    @media (max-height: 620px) {
+      .page { gap: 14px; }
+      .card { padding: 24px 32px; }
+      .maintenance-icon { width: 40px; height: 40px; font-size: 1.2rem; margin-bottom: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="scene"></canvas>
+
+  <div class="page">
+    <div class="logo">
+      <div class="logo-ring"></div>
+      <span class="logo-name">Space Tour</span>
+    </div>
+
+    <div class="badge">
+      <span class="badge-dot"></span>
+      <span>Under Maintenance</span>
+    </div>
+
+    <div class="card">
+      <div class="maintenance-icon">🛰️</div>
+      <h1 class="card-heading">We'll be right back</h1>
+      <p class="card-sub"></p>
+
+      <div class="card-divider"></div>
+
+      <div class="soon-row">
+        <span class="blink-dot"></span>
+        <span class="soon-text">Reservations opening soon</span>
+        <span class="blink-dot"></span>
+      </div>
+
+      <div class="card-divider"></div>
+
+      <p class="card-body">
+       While we complete system maintenance, explore the science behind your journey — from Earth orbit to the Moon and beyond.
+      </p>
+
+      <!-- Path fix: offline.html is in frontend/, Explore.js is in frontend/pages/ -->
+      <a href="index.html#explore" class="explore-btn"
+         onclick="if(window.navigate){event.preventDefault();window.navigate('explore', {exploreEntry: 'offline'});}">
+        <span>🌌</span>
+        Explore the Experience
+      </a>
+    </div>
+
+    <p class="footer-note">Space Tour · Systems restoring</p>
+  </div>
+
+  <script>
+  (function () {
+    const cvs = document.getElementById('scene');
+    const ctx  = cvs.getContext('2d');
+    let W, H;
+
+    /* ── Twinkle stars ── */
+    let stars = [];
+    function seedStars() {
+      stars = [];
+      for (let i = 0; i < 220; i++) {
+        const big = Math.random() < 0.15;
+        stars.push({
+          x: Math.random() * W, y: Math.random() * H,
+          r: big ? 1.3 + Math.random() * 1.2 : 0.4 + Math.random() * 0.8,
+          base: 0.45 + Math.random() * 0.55,
+          sp: 0.03 + Math.random() * 0.15,
+          ph: Math.random() * Math.PI * 2,
+          hue: Math.random() < 0.1 ? (Math.random() < .5 ? 'w' : 'c') : 'n'
+        });
+      }
+    }
+
+    /* ── Meteors ── */
+    let meteors = [], nextMeteor = 1.5;
+    function spawnMeteor() {
+      const ang = Math.PI / 4 + (Math.random() - 0.5) * 0.4;
+      const spd = 300 + Math.random() * 360;
+      meteors.push({
+        x: Math.random() * W * 1.1, y: -15,
+        vx: -Math.cos(ang) * spd, vy: Math.sin(ang) * spd,
+        len: 80 + Math.random() * 120,
+        bright: 0.55 + Math.random() * 0.45,
+        life: 1
+      });
+    }
+
+    /* ── Spacecraft orbit state ──
+       Elliptical path: Earth (bottom-centre) → Moon (upper-right)
+       We parametrise with t ∈ [0,1]: 0 = at Earth, 0.5 = at Moon, 1 = back at Earth
+    */
+    let shipT = 0;          // 0..1 journey progress
+    const ORBIT_SPEED = 0.06; // full round-trip in ~16s
+
+    function getShipPos(t, eX, eY, mX, mY) {
+      /* Bezier arc so it arcs through space rather than cutting straight */
+      /* Control point: top-left of midpoint — gives a nice orbital curve */
+      const midX = (eX + mX) / 2 - (mY - eY) * 0.38;
+      const midY = (eY + mY) / 2 - (mX - eX) * 0.28;
+      const u = t <= 0.5 ? t * 2 : (t - 0.5) * 2; // 0..1 for each leg
+      if (t <= 0.5) {
+        // Earth → Moon along arc
+        return bezier(eX, eY, midX, midY, mX, mY, u);
+      } else {
+        // Moon → Earth return (slightly different arc for visual interest)
+        const midX2 = (mX + eX) / 2 + (mY - eY) * 0.22;
+        const midY2 = (mY + eY) / 2 + (mX - eX) * 0.18;
+        return bezier(mX, mY, midX2, midY2, eX, eY, u);
+      }
+    }
+
+    function bezier(x0, y0, cx, cy, x1, y1, u) {
+      const inv = 1 - u;
+      return {
+        x: inv * inv * x0 + 2 * inv * u * cx + u * u * x1,
+        y: inv * inv * y0 + 2 * inv * u * cy + u * u * y1
+      };
+    }
+
+    function resize() {
+      W = cvs.width  = innerWidth;
+      H = cvs.height = innerHeight;
+      seedStars();
+    }
+
+    let last = performance.now();
+    function draw(now) {
+      const dt = (now - last) / 1000; last = now;
+      ctx.clearRect(0, 0, W, H);
+
+      /* ── Earth — bottom-left, large and fully visible ── */
+      const eR  = Math.min(W, H) * 0.32;
+      const eX  = W * 0.18;
+      const eY  = H * 0.78;
+
+      /* draw Earth */
+      const eg = ctx.createRadialGradient(eX - eR*0.25, eY - eR*0.28, eR*0.05, eX, eY, eR);
+      eg.addColorStop(0,   '#2a80cc');
+      eg.addColorStop(0.3, '#0d4d88');
+      eg.addColorStop(0.7, '#072e56');
+      eg.addColorStop(1,   '#020d1e');
+      ctx.beginPath(); ctx.arc(eX, eY, eR, 0, Math.PI * 2);
+      ctx.fillStyle = eg; ctx.fill();
+
+      /* continent patches */
+      ctx.save(); ctx.clip();
+      [[42,38,26,12,0.28],[66,46,16,9,0.20],[28,58,20,7,0.16]].forEach(([px,py,rw,rh,a]) => {
+        const gx = eX + (px/100 - 0.5) * eR * 2;
+        const gy = eY + (py/100 - 0.5) * eR * 2;
+        const cg = ctx.createRadialGradient(gx, gy, 0, gx, gy, eR * rw/50);
+        cg.addColorStop(0,   `rgba(34,115,55,${a})`);
+        cg.addColorStop(1,   'rgba(0,0,0,0)');
+        ctx.beginPath(); ctx.arc(gx, gy, eR * rw/50, 0, Math.PI * 2);
+        ctx.fillStyle = cg; ctx.fill();
+      });
+      ctx.restore();
+
+      /* atmosphere rim */
+      const atm = ctx.createRadialGradient(eX, eY, eR * 0.88, eX, eY, eR * 1.08);
+      atm.addColorStop(0,   'rgba(80,160,255,0)');
+      atm.addColorStop(0.6, 'rgba(80,160,255,0.18)');
+      atm.addColorStop(1,   'rgba(80,160,255,0)');
+      ctx.beginPath(); ctx.arc(eX, eY, eR * 1.08, 0, Math.PI * 2);
+      ctx.fillStyle = atm; ctx.fill();
+
+      /* ── Moon — upper-right, ~7% viewport width radius ── */
+      const mR  = Math.min(W, H) * 0.07;
+      const mX  = W * 0.82;
+      const mY  = H * 0.14;
+
+      const mg = ctx.createRadialGradient(mX - mR*0.3, mY - mR*0.3, mR*0.05, mX, mY, mR);
+      mg.addColorStop(0,   '#dde0e8');
+      mg.addColorStop(0.4, '#b0b4c0');
+      mg.addColorStop(0.8, '#888a94');
+      mg.addColorStop(1,   '#606270');
+      ctx.beginPath(); ctx.arc(mX, mY, mR, 0, Math.PI * 2);
+      ctx.fillStyle = mg; ctx.fill();
+
+      /* crater marks */
+      ctx.save(); ctx.beginPath(); ctx.arc(mX, mY, mR, 0, Math.PI * 2); ctx.clip();
+      [[30,28,12],[60,55,8],[44,70,6]].forEach(([px,py,rs]) => {
+        const cx2 = mX + (px/100 - 0.5) * mR * 2;
+        const cy2 = mY + (py/100 - 0.5) * mR * 2;
+        const cr  = ctx.createRadialGradient(cx2, cy2, 0, cx2, cy2, mR * rs/50);
+        cr.addColorStop(0, 'rgba(0,0,0,0.22)'); cr.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.beginPath(); ctx.arc(cx2, cy2, mR * rs/50, 0, Math.PI * 2);
+        ctx.fillStyle = cr; ctx.fill();
+      });
+      ctx.restore();
+
+      /* moon glow */
+      const mgl = ctx.createRadialGradient(mX, mY, mR * 0.9, mX, mY, mR * 1.5);
+      mgl.addColorStop(0, 'rgba(200,210,230,0.12)');
+      mgl.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.beginPath(); ctx.arc(mX, mY, mR * 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = mgl; ctx.fill();
+
+      /* ── Stars ── */
+      const tt = now / 1000 * 0.007;
+      stars.forEach(s => {
+        const a = s.base * (0.55 + 0.45 * Math.sin(tt * s.sp * 140 + s.ph));
+        const col = s.hue === 'w' ? `rgba(255,238,195,${a})`
+                  : s.hue === 'c' ? `rgba(175,210,255,${a})`
+                  :                  `rgba(230,237,255,${a})`;
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = col; ctx.fill();
+      });
+
+      /* ── Meteors ── */
+      nextMeteor -= dt;
+      if (nextMeteor <= 0) { spawnMeteor(); nextMeteor = 1.4 + Math.random() * 2.4; }
+      for (let i = meteors.length - 1; i >= 0; i--) {
+        const m = meteors[i];
+        m.x += m.vx * dt; m.y += m.vy * dt; m.life -= dt * 0.9;
+        if (m.life <= 0 || m.x < -300 || m.y > H + 80) { meteors.splice(i, 1); continue; }
+        const spd2 = Math.hypot(m.vx, m.vy);
+        const tX = m.x - (m.vx/spd2)*m.len, tY = m.y - (m.vy/spd2)*m.len;
+        const a  = Math.min(1, m.life * m.bright * 1.6);
+        const gm = ctx.createLinearGradient(m.x, m.y, tX, tY);
+        gm.addColorStop(0,   `rgba(255,255,255,${a})`);
+        gm.addColorStop(0.15,`rgba(210,228,255,${a*0.6})`);
+        gm.addColorStop(0.5, `rgba(160,195,255,${a*0.22})`);
+        gm.addColorStop(1,   `rgba(130,170,255,0)`);
+        ctx.beginPath(); ctx.moveTo(m.x, m.y); ctx.lineTo(tX, tY);
+        ctx.strokeStyle = gm; ctx.lineWidth = 1.1 + m.bright * 0.8;
+        ctx.lineCap = 'round'; ctx.stroke();
+        const hg = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, 4+m.bright*3.5);
+        hg.addColorStop(0, `rgba(255,255,255,${a})`);
+        hg.addColorStop(1, 'rgba(180,210,255,0)');
+        ctx.beginPath(); ctx.arc(m.x, m.y, 4+m.bright*3.5, 0, Math.PI*2);
+        ctx.fillStyle = hg; ctx.fill();
+      }
+
+      /* ── Spacecraft ── */
+      shipT = (shipT + ORBIT_SPEED * dt) % 1;
+      const eAnchorX = eX + eR * 0.55, eAnchorY = eY - eR * 0.55;
+      const mAnchorX = mX, mAnchorY = mY + mR * 0.8;
+      const ship = getShipPos(shipT, eAnchorX, eAnchorY, mAnchorX, mAnchorY);
+
+      /* engine trail */
+      const prevShip = getShipPos((shipT - 0.012 + 1) % 1, eAnchorX, eAnchorY, mAnchorX, mAnchorY);
+      const trailG = ctx.createLinearGradient(ship.x, ship.y, prevShip.x, prevShip.y);
+      trailG.addColorStop(0, 'rgba(120,180,255,0.45)');
+      trailG.addColorStop(1, 'rgba(80,140,255,0)');
+      ctx.beginPath(); ctx.moveTo(ship.x, ship.y); ctx.lineTo(prevShip.x, prevShip.y);
+      ctx.strokeStyle = trailG; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.stroke();
+
+      /* spacecraft body — proper rocket silhouette */
+      const dx = ship.x - prevShip.x, dy = ship.y - prevShip.y;
+      const angle = Math.atan2(dy, dx);
+      ctx.save();
+      ctx.translate(ship.x, ship.y);
+      ctx.rotate(angle);
+
+      /* engine exhaust plume */
+      const plume = ctx.createLinearGradient(-6, 0, -22, 0);
+      plume.addColorStop(0,   'rgba(120,200,255,0.80)');
+      plume.addColorStop(0.4, 'rgba(80,160,255,0.45)');
+      plume.addColorStop(1,   'rgba(60,120,255,0)');
+      ctx.beginPath();
+      ctx.moveTo(-6, -2.5); ctx.lineTo(-22, 0); ctx.lineTo(-6, 2.5);
+      ctx.closePath();
+      ctx.fillStyle = plume; ctx.fill();
+
+      /* outer glow */
+      const sg = ctx.createRadialGradient(0, 0, 0, 0, 0, 16);
+      sg.addColorStop(0, 'rgba(160,220,255,0.22)');
+      sg.addColorStop(1, 'rgba(80,140,255,0)');
+      ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI*2);
+      ctx.fillStyle = sg; ctx.fill();
+
+      /* main body — capsule */
+      ctx.beginPath();
+      ctx.moveTo(10, 0);           /* nose tip */
+      ctx.bezierCurveTo(10, -3.5, 4, -5, -4, -5);  /* top curve */
+      ctx.lineTo(-6, -5);
+      ctx.lineTo(-6,  5);
+      ctx.lineTo(-4,  5);
+      ctx.bezierCurveTo(4, 5, 10, 3.5, 10, 0);     /* bottom curve */
+      ctx.closePath();
+      ctx.fillStyle = '#ccd8ee'; ctx.fill();
+      ctx.strokeStyle = 'rgba(180,210,255,0.5)'; ctx.lineWidth = 0.6; ctx.stroke();
+
+      /* nose cone — darker tip */
+      ctx.beginPath();
+      ctx.moveTo(10, 0);
+      ctx.bezierCurveTo(10, -2.5, 7, -3.5, 4, -3.8);
+      ctx.lineTo(4, 3.8);
+      ctx.bezierCurveTo(7, 3.5, 10, 2.5, 10, 0);
+      ctx.closePath();
+      ctx.fillStyle = '#8aa8d0'; ctx.fill();
+
+      /* solar panel — top */
+      ctx.beginPath();
+      ctx.rect(-3, -11, 7, 5);
+      ctx.fillStyle = '#2a5faa'; ctx.fill();
+      ctx.strokeStyle = 'rgba(100,160,255,0.6)'; ctx.lineWidth = 0.5; ctx.stroke();
+      /* panel connector top */
+      ctx.beginPath(); ctx.rect(-1, -6, 3, 1.5);
+      ctx.fillStyle = '#888'; ctx.fill();
+
+      /* solar panel — bottom */
+      ctx.beginPath();
+      ctx.rect(-3, 6, 7, 5);
+      ctx.fillStyle = '#2a5faa'; ctx.fill();
+      ctx.strokeStyle = 'rgba(100,160,255,0.6)'; ctx.lineWidth = 0.5; ctx.stroke();
+      /* panel connector bottom */
+      ctx.beginPath(); ctx.rect(-1, 4.5, 3, 1.5);
+      ctx.fillStyle = '#888'; ctx.fill();
+
+      /* engine nozzle */
+      ctx.beginPath();
+      ctx.moveTo(-6, -3.5); ctx.lineTo(-10, -5); ctx.lineTo(-10, 5); ctx.lineTo(-6, 3.5);
+      ctx.closePath();
+      ctx.fillStyle = '#7a8aaa'; ctx.fill();
+
+      /* cockpit window */
+      ctx.beginPath(); ctx.arc(5, 0, 2, 0, Math.PI*2);
+      ctx.fillStyle = '#a0d8ff';
+      ctx.shadowColor = '#60c0ff'; ctx.shadowBlur = 4;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      ctx.restore();
+
+      requestAnimationFrame(draw);
+    }
+
+    resize();
+    requestAnimationFrame(draw);
+    window.addEventListener('resize', resize);
+  })();
+  </script>
+</body>
+</html>

@@ -232,4 +232,3 @@ function setLoading(btn, on) {
   if (on)  { btn._orig = btn.innerHTML; btn.innerHTML = `<div class="spinner"></div> Confirming…`; btn.disabled = true; }
   else     { btn.innerHTML = btn._orig || 'Confirm Reservation'; btn.disabled = false; }
 }
-

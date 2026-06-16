@@ -3,7 +3,8 @@
 //  Space visuals, Earth & Moon science
 //  No reservation content on this page.
 // =====================================================
-export function renderExplore() {
+export function renderExplore(entry = 'app') {
+  const showBackButton = entry !== 'offline';
   return `
     <style>
       .xp { min-height: 100vh; display: flex; flex-direction: column; background: var(--soil); color: #eef2f9; }
@@ -291,7 +292,7 @@ export function renderExplore() {
           <div class="xp-logo-ring"></div>
           Space Tour
         </div>
-        <button class="xp-back" id="xp-back">← Back to Home</button>
+        ${showBackButton ? `<button class="xp-back" id="xp-back">← Back to Homepage</button>` : ''}
       </nav>
       <!-- Cinematic hero -->
       <div class="xp-hero">
@@ -479,12 +480,14 @@ export function renderExplore() {
           <div class="xp-logo-ring"></div>
           Space Tour
         </div>
-        <p class="xp-footer-note">© Space Tour · Space Tourism</p>
+        <p class="xp-footer-note">© Space Tour · Space Exploration Reference</p>
       </footer>
     </div>
   `;
 }
-export function initExplore() {
+export function initExplore(entry = 'app') {
+  // xp-back only exists in the DOM when entry !== 'offline' (see renderExplore),
+  // so this safely does nothing if the button isn't present.
   document.getElementById('xp-back')?.addEventListener('click', () => {
     window.navigate('landing', { step: 0 });
   });

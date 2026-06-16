@@ -1,6 +1,6 @@
-// ===================================================
+// =====================================================
 //  Space Tour — App Router & State Manager
-// ===================================================
+// =====================================================
  
 import { renderLanding }       from './pages/Landing.js';
 import { renderExplore, initExplore } from './pages/Explore.js';
@@ -23,6 +23,10 @@ export const State = {
   readiness: {},
   reservationId: null,
   email: null,
+  // Tracks how the Explore page was reached:
+  //  'app'     -> opened from inside the app (Landing page, normal flow)
+  //  'offline' -> opened directly via index.html#explore (e.g. from offline.html)
+  exploreEntry: 'app',
 };
  
 // ── Step config ────────────────────────────────────────
@@ -37,14 +41,47 @@ const STEPS = [
 // Holds the cleanup function returned by initExplore(),
 // so we can stop the canvas animation when leaving the page.
 let exploreCleanup = null;
- 
+
+// Set to true while we are reacting to a browser/device "Back" press,
+// so navigate() doesn't push a brand-new history entry on top of it.
+let handlingPopState = false;
+
 // ── Navigate ───────────────────────────────────────────
 export function navigate(page, data = {}) {
+  const cameFrom = State.page;
   Object.assign(State, data);
   State.page = page;
   render();
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (handlingPopState) return; // browser already moved the history pointer
+
+  if (page === 'landing') {
+    // Returning to Home from inside the app — keep history tidy without
+    // adding a new entry (so a later "Back" press doesn't just retrace steps).
+    if (cameFrom !== 'landing') {
+      history.replaceState({ page: 'landing' }, '', '#landing');
+    }
+  } else if (cameFrom === 'landing') {
+    // Leaving Home for the first time in this run — create exactly one
+    // "back stop" so the device/browser Back button always returns Home,
+    // no matter how many steps are visited afterwards.
+    history.pushState({ page }, '', '#' + page);
+  } else {
+    // Moving between steps/pages without returning Home — update the
+    // current history entry in place instead of growing the stack.
+    history.replaceState({ page }, '', '#' + page);
+  }
 }
+
+// Any browser/device "Back" action (hardware back button, swipe-back,
+// the on-screen Back arrow, etc.) should land the user on the Home page,
+// regardless of which step or page they were on.
+window.addEventListener('popstate', () => {
+  handlingPopState = true;
+  navigate('landing', { step: 0 });
+  handlingPopState = false;
+});
  
 // ── Render ─────────────────────────────────────────────
 function render() {
@@ -64,10 +101,7 @@ function render() {
       ?.addEventListener('click', () => navigate('step1', { step: 1 }));
     document
       .getElementById('btn-explore')
-      ?.addEventListener('click', () => navigate('explore'));
-    document
-      .getElementById('btn-explore')
-      ?.addEventListener('click', () => navigate('explore'));
+      ?.addEventListener('click', () => navigate('explore', { exploreEntry: 'app' }));
     document
       .getElementById('lcard-reserve-earth')
       ?.addEventListener('click', () => navigate('step1', { step: 1, readiness: { duration: 'earth-orbit' } }));
@@ -78,8 +112,8 @@ function render() {
   }
  
   if (page === 'explore') {
-    app.innerHTML = renderExplore();
-    exploreCleanup = initExplore();
+    app.innerHTML = renderExplore(State.exploreEntry);
+    exploreCleanup = initExplore(State.exploreEntry);
     return;
   }
  
@@ -137,4 +171,10 @@ function buildStepBar(current) {
 // ── Boot ───────────────────────────────────────────────
 window.navigate = navigate;
 window.toast    = toast;
+if (window.location.hash === '#explore') {
+  State.page = 'explore';
+  // Reached directly via a link/hash (e.g. the "Explore the Experience"
+  // button on offline.html) rather than from inside the running app.
+  State.exploreEntry = 'offline';
+}
 render();
