@@ -8,26 +8,37 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    /* ── CSS variables ── */
     :root {
-      --gold:       #f0d9ae;
-      --gold-dim:   rgba(226,197,148,0.12);
-      --gold-line:  rgba(226,197,148,0.28);
-      --ink:        #f5f8ff;
-      --muted:      rgba(196,208,232,0.88);
-      --dim:        rgba(158,172,206,0.90);
-      --panel:      rgba(4,6,18,0.80);
-      --panel-line: rgba(226,197,148,0.16);
+      --gold:         #f0d9ae;
+      --gold-dim:     rgba(226,197,148,0.12);
+      --gold-line:    rgba(226,197,148,0.28);
+      --ink:          #f5f8ff;
+      --muted:        rgba(196,208,232,0.88);
+      --dim:          rgba(158,172,206,0.90);
+      --panel:        rgba(4,6,18,0.80);
+      --panel-line:   rgba(226,197,148,0.16);
+      /* Explore page vars */
+      --soil:         #020610;
+      --terracotta:   #4a90e2;
+      --terra-light:  #7ab8ff;
+      --ochre:        #c9a368;
+      --ochre-light:  #e2c594;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-mono:    'Space Mono', monospace;
+      --font-body:    'Inter', sans-serif;
     }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     html, body {
       height: 100%; width: 100%;
-      overflow: hidden;           /* NO SCROLL */
       margin: 0; padding: 0;
       font-family: 'Inter', sans-serif;
       background: #000;
       color: var(--ink);
       -webkit-font-smoothing: antialiased;
+      overflow: hidden;
     }
 
     /* ══ CANVAS — full background scene ═══════════════════ */
@@ -36,16 +47,19 @@
       pointer-events: none;
     }
 
-    /* ══ PAGE — centred, no scroll ════════════════════════ */
-    .page {
+    /* ══ OFFLINE PAGE ══════════════════════════════════════ */
+    #offline-page {
       position: fixed; inset: 0; z-index: 10;
       display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 22px; padding: 24px;
+      overflow: hidden;
     }
 
-    /* ── Logo ── */
-    .logo { display: flex; align-items: center; gap: 10px; }
+    /* ── Top-left Logo ── */
+    .logo-corner {
+      position: absolute; top: 28px; left: 32px;
+      display: flex; align-items: center; gap: 10px;
+      z-index: 20;
+    }
     .logo-ring {
       width: 26px; height: 26px; border-radius: 50%;
       border: 2px solid rgba(74,144,226,.85);
@@ -61,7 +75,17 @@
       font-size: 1.1rem; font-weight: 800; color: var(--ink); letter-spacing: 0.03em;
     }
 
-    /* ── Badge ── */
+    /* ── Bottom-right floating panel ── */
+    .offline-panel {
+      position: absolute;
+      bottom: 40px; right: 48px;
+      display: flex; flex-direction: column;
+      align-items: flex-end;
+      gap: 16px;
+      z-index: 20;
+    }
+
+    /* Badge */
     .badge {
       display: inline-flex; align-items: center; gap: 8px;
       font-family: 'Space Mono', monospace;
@@ -78,54 +102,18 @@
       50%      { opacity:.2; transform:scale(.65); }
     }
 
-    /* ── Card ── */
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--panel-line);
-      border-radius: 20px; padding: 36px 42px; text-align: center;
-      width: 100%; max-width: 440px;
-      backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
-      position: relative; overflow: hidden;
-      box-shadow: 0 24px 70px -20px rgba(0,0,0,.9), 0 0 0 1px rgba(255,255,255,.025) inset;
-    }
-    .card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(226,197,148,.45), transparent);
-    }
-
-    .maintenance-icon {
-      width: 52px; height: 52px; margin: 0 auto 18px;
-      border-radius: 50%;
-      background: rgba(226,197,148,.07);
-      border: 1px solid rgba(226,197,148,.18);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.5rem;
-      animation: icon-float 4s ease-in-out infinite;
-    }
-    @keyframes icon-float {
-      0%,100% { transform: translateY(0); }
-      50%      { transform: translateY(-5px); }
-    }
-
-    .card-heading {
+    /* Main heading */
+    .offline-heading {
       font-family: 'Playfair Display', Georgia, serif;
-      font-size: clamp(1.25rem, 3.5vw, 1.65rem);
-      color: var(--ink); margin-bottom: 7px;
-      letter-spacing: -0.01em; line-height: 1.2;
-    }
-    .card-sub {
-      font-family: 'Space Mono', monospace; font-size: 0.68rem;
-      letter-spacing: .14em; color: var(--dim); margin-bottom: 18px;
-      text-transform: uppercase;
-    }
-    .card-divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--gold-line), transparent);
-      margin: 16px 0;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      color: var(--ink); text-align: right;
+      letter-spacing: -0.02em; line-height: 1.1;
+      text-shadow: 0 2px 30px rgba(0,0,0,.8);
     }
 
+    /* Soon row */
     .soon-row {
-      display: flex; align-items: center; justify-content: center; gap: 10px;
+      display: flex; align-items: center; gap: 10px;
     }
     .blink-dot {
       width: 7px; height: 7px; border-radius: 50%;
@@ -142,16 +130,17 @@
       color: var(--gold); font-weight: 700;
     }
 
-    .card-body {
-      font-size: 0.84rem; line-height: 1.8;
-      color: var(--muted); font-weight: 300;
-      margin-bottom: 22px;
+    /* We'll be right back */
+    .back-soon {
+      font-family: 'Space Mono', monospace; font-size: 0.62rem;
+      letter-spacing: .16em; text-transform: uppercase;
+      color: rgba(196,208,232,.55);
     }
 
-    /* ── Explore button ── */
+    /* Explore button */
     .explore-btn {
       display: inline-flex; align-items: center; gap: 9px;
-      padding: 12px 28px;
+      padding: 13px 30px;
       background: rgba(74,120,226,0.15);
       border: 1px solid rgba(100,140,255,0.36);
       color: #b8c8ff;
@@ -159,6 +148,20 @@
       border-radius: 11px; cursor: pointer; text-decoration: none;
       transition: all .22s ease;
       box-shadow: 0 4px 20px -6px rgba(74,120,226,.25);
+      /* meteor shimmer animation */
+      position: relative; overflow: hidden;
+    }
+    .explore-btn::after {
+      content: '';
+      position: absolute; top: 0; left: -100%;
+      width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(180,210,255,0.18), transparent);
+      animation: btn-shimmer 3.2s ease-in-out infinite;
+    }
+    @keyframes btn-shimmer {
+      0%   { left: -100%; }
+      40%  { left: 140%; }
+      100% { left: 140%; }
     }
     .explore-btn:hover {
       background: rgba(74,120,226,0.26);
@@ -169,16 +172,293 @@
     }
     .explore-btn:active { transform: translateY(0); }
 
+    /* footer note */
     .footer-note {
-      font-family: 'Space Mono', monospace; font-size: 0.52rem;
+      font-family: 'Space Mono', monospace; font-size: 0.50rem;
       letter-spacing: .16em; text-transform: uppercase;
-      color: rgba(100,113,150,.32); text-align: center;
+      color: rgba(100,113,150,.28);
     }
 
-    @media (max-height: 620px) {
-      .page { gap: 14px; }
-      .card { padding: 24px 32px; }
-      .maintenance-icon { width: 40px; height: 40px; font-size: 1.2rem; margin-bottom: 12px; }
+    /* ══ EXPLORE PANEL (hidden initially) ════════════════ */
+    #explore-page {
+      display: none;
+      position: fixed; inset: 0; z-index: 100;
+      overflow-y: auto;
+      background: #020610;
+    }
+    #explore-page.visible { display: block; }
+
+    /* Explore CSS — inlined from Explore.js */
+    .xp { min-height: 100vh; display: flex; flex-direction: column; background: var(--soil); color: #eef2f9; }
+    .xp-nav {
+      position: sticky; top: 0; z-index: 50;
+      padding: 18px 48px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(3,6,15,.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .xp-logo {
+      font-family: var(--font-display); font-size: 1.05rem; font-weight: 800;
+      color: #eef2f9; display: flex; align-items: center; gap: 10px; cursor: pointer;
+    }
+    .xp-logo-ring {
+      width: 24px; height: 24px; border-radius: 50%;
+      border: 2px solid var(--terracotta);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .xp-logo-ring::after { content:''; width:7px; height:7px; border-radius:50%; background:var(--terracotta); }
+    .xp-back {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 18px;
+      background: transparent; color: rgba(238,242,249,.8);
+      font-family: var(--font-body); font-size: 0.85rem; font-weight: 600;
+      border: 1px solid rgba(238,242,249,.22); border-radius: 8px; cursor: pointer;
+      transition: border-color .2s, background .2s;
+    }
+    .xp-back:hover { border-color: rgba(238,242,249,.5); background: rgba(238,242,249,.07); }
+    .xp-hero {
+      position: relative; height: 520px; overflow: hidden;
+      display: flex; align-items: flex-end;
+    }
+    .xp-hero-canvas {
+      position: absolute; inset: 0; background: #020610;
+    }
+    .xp-hero-canvas::before {
+      content: ''; position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 100%, rgba(20,50,130,.55) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 50% at 80% 40%, rgba(201,163,104,.08) 0%, transparent 60%);
+    }
+    .xp-hero-canvas::after {
+      content: ''; position: absolute; inset: 0;
+      background-image:
+        radial-gradient(1.5px 1.5px at 5%  8%,  rgba(255,255,255,.9), transparent),
+        radial-gradient(1px   1px   at 18% 22%, rgba(255,255,255,.7), transparent),
+        radial-gradient(2px   2px   at 32% 12%, rgba(255,255,255,.8), transparent),
+        radial-gradient(1px   1px   at 45% 35%, rgba(255,255,255,.6), transparent),
+        radial-gradient(1.5px 1.5px at 58% 18%, rgba(255,255,255,.85),transparent),
+        radial-gradient(1px   1px   at 70% 8%,  rgba(255,255,255,.7), transparent),
+        radial-gradient(2px   2px   at 82% 28%, rgba(255,255,255,.6), transparent),
+        radial-gradient(1px   1px   at 92% 15%, rgba(255,255,255,.8), transparent),
+        radial-gradient(1px   1px   at 12% 52%, rgba(255,255,255,.5), transparent),
+        radial-gradient(1.5px 1.5px at 27% 68%, rgba(255,255,255,.6), transparent),
+        radial-gradient(1px   1px   at 63% 55%, rgba(255,255,255,.55),transparent),
+        radial-gradient(1px   1px   at 88% 62%, rgba(255,255,255,.65),transparent);
+      background-repeat: no-repeat;
+    }
+    .xp-hero-earth-img {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      border-radius: 0; object-fit: cover; object-position: center center;
+      z-index: 1; opacity: 0.55;
+    }
+    .xp-hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(3,6,15,1) 0%, rgba(3,6,15,.35) 55%, transparent 100%);
+    }
+    .xp-hero-content { position: relative; z-index: 2; padding: 0 52px 48px; }
+    .xp-hero-eyebrow {
+      font-family: var(--font-mono); font-size: 0.60rem;
+      letter-spacing: .20em; text-transform: uppercase;
+      color: var(--ochre-light); margin-bottom: 12px;
+      display: flex; align-items: center; gap: 9px;
+    }
+    .xp-hero-eyebrow-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--ochre-light); display: inline-block;
+      animation: xp-blink 1.3s ease-in-out infinite;
+    }
+    @keyframes xp-blink { 0%,100%{opacity:1} 50%{opacity:.15} }
+    .xp-hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 800; color: #eef2f9;
+      letter-spacing: -0.02em; line-height: 1.05;
+    }
+    .xp-hero-title em { font-style: italic; color: var(--ochre-light); }
+    .xp-body { padding: 64px 48px 80px; max-width: 1120px; margin: 0 auto; width: 100%; }
+    .xp-label {
+      font-family: var(--font-mono); font-size: 0.60rem;
+      letter-spacing: .18em; text-transform: uppercase;
+      color: rgba(226,197,148,.55);
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 28px;
+    }
+    .xp-label::after { content:''; flex:1; height:1px; background: rgba(255,255,255,.07); }
+    .xp-intro {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
+      margin-bottom: 64px;
+    }
+    .xp-intro-text h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800; color: #eef2f9;
+      letter-spacing: -0.015em; line-height: 1.1;
+      margin-bottom: 18px;
+    }
+    .xp-intro-text p {
+      font-size: 0.95rem; line-height: 1.82;
+      color: rgba(169,183,212,.85);
+      font-weight: 300; margin-bottom: 14px;
+    }
+    .xp-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .xp-stat-box {
+      background: rgba(14,24,48,.65);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 12px; padding: 18px 20px;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .xp-stat-k {
+      font-family: var(--font-mono); font-size: 0.54rem;
+      letter-spacing: .15em; text-transform: uppercase;
+      color: rgba(169,183,212,.5);
+    }
+    .xp-stat-v {
+      font-family: var(--font-display); font-size: 1.6rem;
+      color: #eef2f9; line-height: 1; font-weight: 700;
+    }
+    .xp-stat-s { font-size: 0.76rem; color: rgba(169,183,212,.6); margin-top: 2px; }
+    .xp-feature {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+      border-radius: 20px; overflow: hidden;
+      margin-bottom: 28px;
+      border: 1px solid rgba(255,255,255,.07);
+    }
+    .xp-feature.reverse { direction: rtl; }
+    .xp-feature.reverse > * { direction: ltr; }
+    .xp-feature-visual {
+      min-height: 320px; position: relative; overflow: hidden;
+      background: #020610;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .xp-feature-visual.earth-vis {
+      background: radial-gradient(ellipse at 60% 50%, rgba(20,55,150,.45) 0%, #020610 70%);
+    }
+    .xp-feature-visual.moon-vis {
+      background: radial-gradient(ellipse at 40% 50%, rgba(100,70,20,.28) 0%, #020610 70%);
+    }
+    .xp-fv-img {
+      width: 300px; height: 300px;
+      border-radius: 50%; object-fit: cover;
+      position: relative; z-index: 1;
+      mask-image: radial-gradient(circle at 50% 50%, black 55%, transparent 78%);
+      -webkit-mask-image: radial-gradient(circle at 50% 50%, black 55%, transparent 78%);
+    }
+    .xp-fv-stars {
+      position:absolute; inset:0;
+      background-image:
+        radial-gradient(1px 1px at 8% 15%,  rgba(255,255,255,.8),transparent),
+        radial-gradient(1px 1px at 20% 70%, rgba(255,255,255,.6),transparent),
+        radial-gradient(1.5px 1.5px at 38% 10%,rgba(255,255,255,.75),transparent),
+        radial-gradient(1px 1px at 75% 25%, rgba(255,255,255,.7),transparent),
+        radial-gradient(1px 1px at 88% 80%, rgba(255,255,255,.55),transparent),
+        radial-gradient(1px 1px at 55% 88%, rgba(255,255,255,.5),transparent);
+      background-repeat:no-repeat;
+    }
+    .xp-feature-text {
+      background: rgba(8,14,30,.88);
+      padding: 44px 44px;
+      display: flex; flex-direction: column; justify-content: center; gap: 18px;
+    }
+    .xp-feature-tag {
+      font-family: var(--font-mono); font-size: 0.58rem;
+      letter-spacing: .16em; text-transform: uppercase;
+      display: inline-flex; align-items: center; gap: 7px;
+      width: fit-content; padding: 5px 13px; border-radius: 9999px;
+    }
+    .xp-feature-tag.earth-tag {
+      color: var(--terra-light);
+      background: rgba(47,111,209,.12); border: 1px solid rgba(47,111,209,.30);
+    }
+    .xp-feature-tag.moon-tag {
+      color: var(--ochre-light);
+      background: rgba(201,163,104,.10); border: 1px solid rgba(201,163,104,.28);
+    }
+    .xp-feature-h {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 2.8vw, 2rem);
+      font-weight: 800; color: #eef2f9;
+      letter-spacing: -0.015em; line-height: 1.1;
+    }
+    .xp-feature-p {
+      font-size: 0.92rem; line-height: 1.82;
+      color: rgba(169,183,212,.82); font-weight: 300;
+    }
+    .xp-fact-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+    .xp-fact {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 0.86rem; color: rgba(169,183,212,.75); line-height: 1.55;
+    }
+    .xp-fact-dot {
+      width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 5px;
+    }
+    .earth-tag-dot { background: var(--terracotta); }
+    .moon-tag-dot  { background: var(--ochre); }
+    .xp-science-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+      margin-bottom: 64px;
+    }
+    .xp-sci-card {
+      background: rgba(12,20,42,.72);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 14px; padding: 26px 22px;
+      display: flex; flex-direction: column; gap: 12px;
+      transition: border-color .2s, background .2s;
+    }
+    .xp-sci-card:hover { border-color: rgba(226,197,148,.25); background: rgba(18,28,56,.80); }
+    .xp-sci-icon { font-size: 1.8rem; }
+    .xp-sci-title {
+      font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: #eef2f9;
+    }
+    .xp-sci-body { font-size: 0.84rem; color: rgba(169,183,212,.78); line-height: 1.72; font-weight: 300; }
+    .xp-footer {
+      background: rgba(2,4,12,.9);
+      border-top: 1px solid rgba(255,255,255,.05);
+      padding: 24px 48px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 10px; margin-top: auto;
+    }
+    .xp-footer-brand {
+      font-family: var(--font-display); font-weight: 800; font-size: .9rem;
+      color: #eef2f9; display: flex; align-items: center; gap: 10px;
+    }
+    .xp-footer-note {
+      font-family: var(--font-mono); font-size: .58rem;
+      letter-spacing: .10em; text-transform: uppercase;
+      color: rgba(100,113,150,.4);
+    }
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .xp-intro { grid-template-columns: 1fr; }
+      .xp-science-grid { grid-template-columns: 1fr 1fr; }
+      .xp-feature { grid-template-columns: 1fr; }
+      .xp-feature-visual { min-height: 260px; }
+      .xp-feature.reverse { direction: ltr; }
+    }
+    @media (max-width: 640px) {
+      .xp-nav { padding: 16px 20px; }
+      .xp-hero { height: 400px; }
+      .xp-hero-content { padding: 0 20px 36px; }
+      .xp-body { padding: 44px 20px 60px; }
+      .xp-science-grid { grid-template-columns: 1fr; }
+      .xp-feature-text { padding: 28px 24px; }
+      .xp-footer { padding: 20px; justify-content: center; text-align: center; }
+      .xp-fv-img { width: 200px; height: 200px; }
+      .offline-panel { right: 20px; bottom: 28px; }
+      .logo-corner { top: 20px; left: 20px; }
+    }
+
+    /* ── Meteor/star animations for offline text ── */
+    @keyframes float-up {
+      0%,100% { transform: translateY(0px); }
+      50%      { transform: translateY(-6px); }
+    }
+    .offline-heading { animation: float-up 5s ease-in-out infinite; }
+
+    /* Particle orbit ring behind heading */
+    @keyframes orbit-ring {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -186,23 +466,24 @@
 
   <canvas id="scene"></canvas>
 
-  <div class="page">
-    <div class="logo">
+  <!-- ══ OFFLINE PAGE ══ -->
+  <div id="offline-page">
+
+    <!-- Top-left Logo -->
+    <div class="logo-corner">
       <div class="logo-ring"></div>
       <span class="logo-name">Space Tour</span>
     </div>
 
-    <div class="badge">
-      <span class="badge-dot"></span>
-      <span>Under Maintenance</span>
-    </div>
+    <!-- Bottom-right panel: all controls -->
+    <div class="offline-panel">
 
-    <div class="card">
-      <div class="maintenance-icon">🛰️</div>
-      <h1 class="card-heading">We'll be right back</h1>
-      <p class="card-sub"></p>
+      <div class="badge">
+        <span class="badge-dot"></span>
+        <span>Under Maintenance</span>
+      </div>
 
-      <div class="card-divider"></div>
+     
 
       <div class="soon-row">
         <span class="blink-dot"></span>
@@ -210,34 +491,228 @@
         <span class="blink-dot"></span>
       </div>
 
-      <div class="card-divider"></div>
-
-      <p class="card-body">
-       While we complete system maintenance, explore the science behind your journey — from Earth orbit to the Moon and beyond.
-      </p>
-
-      <!-- Path fix: offline.html is in frontend/, Explore.js is in frontend/pages/ -->
-      <a href="index.html#explore" class="explore-btn"
-         onclick="if(window.navigate){event.preventDefault();window.navigate('explore', {exploreEntry: 'offline'});}">
-        <span>🌌</span>
-        Explore the Experience
-      </a>
+      <!-- Explore button -->
+      <button class="explore-btn" id="explore-open-btn">
+        <span></span>
+        Explore the Experiences
+      </button>
     </div>
+  </div>
 
-    <p class="footer-note">Space Tour · Systems restoring</p>
+  <!-- ══ EXPLORE PAGE (inline, no redirect needed) ══ -->
+  <div id="explore-page">
+    <div class="xp">
+      <!-- Nav -->
+      <nav class="xp-nav">
+        <div class="xp-logo" id="xp-logo">
+          <div class="xp-logo-ring"></div>
+          Space Tour
+        </div>
+        <button class="xp-back" id="xp-back">← Back</button>
+      </nav>
+      <!-- Cinematic hero -->
+      <div class="xp-hero">
+        <div class="xp-hero-canvas"></div>
+        <img class="xp-hero-earth-img" src="assests/earth.png" alt="Earth from space" />
+        <div class="xp-hero-overlay"></div>
+        <div class="xp-hero-content">
+          <div class="xp-hero-eyebrow">
+            <span class="xp-hero-eyebrow-dot"></span>
+            Earth · Moon · Deep Space
+          </div>
+          <h1 class="xp-hero-title">
+            Looking at Earth<br>from <em>out there</em>
+          </h1>
+        </div>
+      </div>
+      <!-- Body -->
+      <div class="xp-body">
+        <!-- Intro -->
+        <div class="xp-label">The Overview Effect</div>
+        <div class="xp-intro">
+          <div class="xp-intro-text">
+            <h2>What it means to leave the atmosphere</h2>
+            <p>
+              From Low Earth Orbit, roughly 400 km above the surface, you can see the entire curvature
+              of the planet in a single glance. The atmosphere — the thin blue line that makes all life
+              possible — is shockingly fragile. Astronauts describe a fundamental shift in perception
+              called the Overview Effect: the borders between countries vanish, the scale of the ocean
+              becomes visceral, and the silence is absolute.
+            </p>
+            <p>
+              Humans have experienced this view fewer than 700 times in history. At orbital velocity
+              — roughly 28,000 km/h — you circle the entire Earth in 90 minutes and witness 16 sunrises
+              and sunsets every single day.
+            </p>
+          </div>
+          <div class="xp-stat-grid">
+            <div class="xp-stat-box">
+              <span class="xp-stat-k">Orbital Altitude</span>
+              <span class="xp-stat-v">~400 km</span>
+              <span class="xp-stat-s">Low Earth Orbit</span>
+            </div>
+            <div class="xp-stat-box">
+              <span class="xp-stat-k">Orbital Speed</span>
+              <span class="xp-stat-v">28,000</span>
+              <span class="xp-stat-s">km/h around Earth</span>
+            </div>
+            <div class="xp-stat-box">
+              <span class="xp-stat-k">Orbit Duration</span>
+              <span class="xp-stat-v">90 min</span>
+              <span class="xp-stat-s">One full orbit</span>
+            </div>
+            <div class="xp-stat-box">
+              <span class="xp-stat-k">Sunrises / Day</span>
+              <span class="xp-stat-v">16</span>
+              <span class="xp-stat-s">From orbit</span>
+            </div>
+          </div>
+        </div>
+        <!-- Earth Orbit feature -->
+        <div class="xp-label">Earth from Orbit</div>
+        <div class="xp-feature" style="margin-bottom:28px">
+          <div class="xp-feature-visual earth-vis">
+            <div class="xp-fv-stars"></div>
+            <img class="xp-fv-img" src="assests/earth-1.webp" alt="Earth from orbit" />
+          </div>
+          <div class="xp-feature-text">
+            <div class="xp-feature-tag earth-tag">🌍 Low Earth Orbit</div>
+            <h3 class="xp-feature-h">Earth</h3>
+            <p class="xp-feature-p">
+              Low Earth Orbit sits between 160 and 2,000 km above the surface. At 400 km —
+              the altitude of the International Space Station — you travel fast enough that
+              gravity bends your path into a continuous fall around the planet, creating
+              perpetual weightlessness.
+            </p>
+            <div class="xp-fact-list">
+              <div class="xp-fact"><span class="xp-fact-dot earth-tag-dot"></span>Earth covers roughly 50% of your field of view from 400 km</div>
+              <div class="xp-fact"><span class="xp-fact-dot earth-tag-dot"></span>The Sahara, Amazon, Himalayas — all visible in a single orbit pass</div>
+              <div class="xp-fact"><span class="xp-fact-dot earth-tag-dot"></span>City lights are visible from orbit on the night side of the planet</div>
+              <div class="xp-fact"><span class="xp-fact-dot earth-tag-dot"></span>Thunderstorm systems look like slow-motion light pulses from above</div>
+            </div>
+          </div>
+        </div>
+        <!-- Moon Flyby feature -->
+        <div class="xp-label">Lunar Flyby</div>
+        <div class="xp-feature reverse" style="margin-bottom:64px">
+          <div class="xp-feature-visual moon-vis">
+            <div class="xp-fv-stars"></div>
+            <img class="xp-fv-img" src="assests/moon.jpg" alt="The Moon from space" />
+          </div>
+          <div class="xp-feature-text">
+            <div class="xp-feature-tag moon-tag">🌕 Lunar Orbit</div>
+            <h3 class="xp-feature-h">Moon</h3>
+            <p class="xp-feature-p">
+              The Moon sits 384,400 km from Earth — roughly 1.3 light-seconds away. Flying
+              around it means crossing the boundary where Earth's gravity yields to the Moon's.
+              From low lunar orbit, the surface fills your view: craters billions of years old,
+              highlands, and the vast dark plains called maria formed by ancient volcanic flows.
+            </p>
+            <div class="xp-fact-list">
+              <div class="xp-fact"><span class="xp-fact-dot moon-tag-dot"></span>The lunar far side was first seen by humans in 1968 (Apollo 8)</div>
+              <div class="xp-fact"><span class="xp-fact-dot moon-tag-dot"></span>The Moon has no atmosphere — craters are perfectly preserved for billions of years</div>
+              <div class="xp-fact"><span class="xp-fact-dot moon-tag-dot"></span>From lunar orbit, Earth appears four times larger than the Moon does from Earth</div>
+              <div class="xp-fact"><span class="xp-fact-dot moon-tag-dot"></span>Surface temperatures range from −173°C (night) to +127°C (day)</div>
+            </div>
+          </div>
+        </div>
+        <!-- Science cards -->
+        <div class="xp-label">Space Science</div>
+        <div class="xp-science-grid">
+          <div class="xp-sci-card">
+            <div class="xp-sci-icon">🚀</div>
+            <div class="xp-sci-title">Escaping the Atmosphere</div>
+            <div class="xp-sci-body">
+              To reach orbit, a spacecraft must accelerate to around 7.9 km/s — orbital velocity.
+              At this speed, the craft falls toward Earth at the same rate the planet's surface
+              curves away, creating continuous free-fall: weightlessness.
+            </div>
+          </div>
+          <div class="xp-sci-card">
+            <div class="xp-sci-icon">🌌</div>
+            <div class="xp-sci-title">The Silence of Space</div>
+            <div class="xp-sci-body">
+              Space is not empty — it contains gas, dust, and radiation — but it is far too thin
+              to carry sound. Without air molecules to vibrate, there is no medium for acoustic
+              waves. The only sounds in a spacecraft come from machinery inside the pressurised cabin.
+            </div>
+          </div>
+          <div class="xp-sci-card">
+            <div class="xp-sci-icon">🌒</div>
+            <div class="xp-sci-title">Why the Moon Doesn't Fall</div>
+            <div class="xp-sci-body">
+              Like an orbital spacecraft, the Moon is perpetually falling toward Earth — it simply
+              moves sideways fast enough that it keeps missing. This balance between gravitational
+              pull and orbital velocity has kept the Moon locked in its current orbit for 4.5 billion years.
+            </div>
+          </div>
+          <div class="xp-sci-card">
+            <div class="xp-sci-icon">🌠</div>
+            <div class="xp-sci-title">Stars Without Atmosphere</div>
+            <div class="xp-sci-body">
+              Earth's atmosphere blurs and scatters starlight, making stars twinkle.
+              From space, stars appear as fixed, sharp points of intense light — thousands more
+              visible than from any ground-based observatory, in colours invisible to Earth-bound eyes.
+            </div>
+          </div>
+          <div class="xp-sci-card">
+            <div class="xp-sci-icon">⚡</div>
+            <div class="xp-sci-title">Radiation in Space</div>
+            <div class="xp-sci-body">
+              Earth's magnetic field deflects most cosmic radiation. Beyond it, astronauts are
+              exposed to higher radiation levels from solar wind and galactic cosmic rays. Mission
+              duration, altitude, and solar activity all determine total exposure for any given trip.
+            </div>
+          </div>
+          <div class="xp-sci-card">
+            <div class="xp-sci-icon">🌍</div>
+            <div class="xp-sci-title">Earthrise</div>
+            <div class="xp-sci-body">
+              When Apollo 8 orbited the Moon in 1968, astronaut Bill Anders photographed Earth
+              rising above the lunar horizon. That image — Earthrise — is credited with helping
+              launch the environmental movement and permanently changing how humanity sees its home.
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Footer -->
+      <footer class="xp-footer">
+        <div class="xp-footer-brand">
+          <div class="xp-logo-ring"></div>
+          Space Tour
+        </div>
+        <p class="xp-footer-note">© Space Tour · Space Exploration</p>
+      </footer>
+    </div>
   </div>
 
   <script>
+  /* ══════════════════════════════════════════════════
+     Explore panel toggle
+  ══════════════════════════════════════════════════ */
+  document.getElementById('explore-open-btn').addEventListener('click', function () {
+    document.getElementById('explore-page').classList.add('visible');
+    document.getElementById('explore-page').scrollTop = 0;
+  });
+  document.getElementById('xp-back').addEventListener('click', function () {
+    document.getElementById('explore-page').classList.remove('visible');
+  });
+  document.getElementById('xp-logo').addEventListener('click', function () {
+    document.getElementById('explore-page').classList.remove('visible');
+  });
+
+  /* ══════════════════════════════════════════════════
+     Space canvas — stars, meteors, spacecraft, Earth & Moon
+  ══════════════════════════════════════════════════ */
   (function () {
     const cvs = document.getElementById('scene');
     const ctx  = cvs.getContext('2d');
     let W, H;
 
-    /* ── Twinkle stars ── */
     let stars = [];
     function seedStars() {
       stars = [];
-      for (let i = 0; i < 220; i++) {
+      for (let i = 0; i < 260; i++) {
         const big = Math.random() < 0.15;
         stars.push({
           x: Math.random() * W, y: Math.random() * H,
@@ -250,7 +725,6 @@
       }
     }
 
-    /* ── Meteors ── */
     let meteors = [], nextMeteor = 1.5;
     function spawnMeteor() {
       const ang = Math.PI / 4 + (Math.random() - 0.5) * 0.4;
@@ -264,24 +738,16 @@
       });
     }
 
-    /* ── Spacecraft orbit state ──
-       Elliptical path: Earth (bottom-centre) → Moon (upper-right)
-       We parametrise with t ∈ [0,1]: 0 = at Earth, 0.5 = at Moon, 1 = back at Earth
-    */
-    let shipT = 0;          // 0..1 journey progress
-    const ORBIT_SPEED = 0.06; // full round-trip in ~16s
+    let shipT = 0;
+    const ORBIT_SPEED = 0.06;
 
     function getShipPos(t, eX, eY, mX, mY) {
-      /* Bezier arc so it arcs through space rather than cutting straight */
-      /* Control point: top-left of midpoint — gives a nice orbital curve */
       const midX = (eX + mX) / 2 - (mY - eY) * 0.38;
       const midY = (eY + mY) / 2 - (mX - eX) * 0.28;
-      const u = t <= 0.5 ? t * 2 : (t - 0.5) * 2; // 0..1 for each leg
+      const u = t <= 0.5 ? t * 2 : (t - 0.5) * 2;
       if (t <= 0.5) {
-        // Earth → Moon along arc
         return bezier(eX, eY, midX, midY, mX, mY, u);
       } else {
-        // Moon → Earth return (slightly different arc for visual interest)
         const midX2 = (mX + eX) / 2 + (mY - eY) * 0.22;
         const midY2 = (mY + eY) / 2 + (mX - eX) * 0.18;
         return bezier(mX, mY, midX2, midY2, eX, eY, u);
@@ -307,12 +773,10 @@
       const dt = (now - last) / 1000; last = now;
       ctx.clearRect(0, 0, W, H);
 
-      /* ── Earth — bottom-left, large and fully visible ── */
       const eR  = Math.min(W, H) * 0.32;
       const eX  = W * 0.18;
       const eY  = H * 0.78;
 
-      /* draw Earth */
       const eg = ctx.createRadialGradient(eX - eR*0.25, eY - eR*0.28, eR*0.05, eX, eY, eR);
       eg.addColorStop(0,   '#2a80cc');
       eg.addColorStop(0.3, '#0d4d88');
@@ -321,7 +785,6 @@
       ctx.beginPath(); ctx.arc(eX, eY, eR, 0, Math.PI * 2);
       ctx.fillStyle = eg; ctx.fill();
 
-      /* continent patches */
       ctx.save(); ctx.clip();
       [[42,38,26,12,0.28],[66,46,16,9,0.20],[28,58,20,7,0.16]].forEach(([px,py,rw,rh,a]) => {
         const gx = eX + (px/100 - 0.5) * eR * 2;
@@ -334,7 +797,6 @@
       });
       ctx.restore();
 
-      /* atmosphere rim */
       const atm = ctx.createRadialGradient(eX, eY, eR * 0.88, eX, eY, eR * 1.08);
       atm.addColorStop(0,   'rgba(80,160,255,0)');
       atm.addColorStop(0.6, 'rgba(80,160,255,0.18)');
@@ -342,7 +804,6 @@
       ctx.beginPath(); ctx.arc(eX, eY, eR * 1.08, 0, Math.PI * 2);
       ctx.fillStyle = atm; ctx.fill();
 
-      /* ── Moon — upper-right, ~7% viewport width radius ── */
       const mR  = Math.min(W, H) * 0.07;
       const mX  = W * 0.82;
       const mY  = H * 0.14;
@@ -355,7 +816,6 @@
       ctx.beginPath(); ctx.arc(mX, mY, mR, 0, Math.PI * 2);
       ctx.fillStyle = mg; ctx.fill();
 
-      /* crater marks */
       ctx.save(); ctx.beginPath(); ctx.arc(mX, mY, mR, 0, Math.PI * 2); ctx.clip();
       [[30,28,12],[60,55,8],[44,70,6]].forEach(([px,py,rs]) => {
         const cx2 = mX + (px/100 - 0.5) * mR * 2;
@@ -367,14 +827,12 @@
       });
       ctx.restore();
 
-      /* moon glow */
       const mgl = ctx.createRadialGradient(mX, mY, mR * 0.9, mX, mY, mR * 1.5);
       mgl.addColorStop(0, 'rgba(200,210,230,0.12)');
       mgl.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.beginPath(); ctx.arc(mX, mY, mR * 1.5, 0, Math.PI * 2);
       ctx.fillStyle = mgl; ctx.fill();
 
-      /* ── Stars ── */
       const tt = now / 1000 * 0.007;
       stars.forEach(s => {
         const a = s.base * (0.55 + 0.45 * Math.sin(tt * s.sp * 140 + s.ph));
@@ -385,7 +843,6 @@
         ctx.fillStyle = col; ctx.fill();
       });
 
-      /* ── Meteors ── */
       nextMeteor -= dt;
       if (nextMeteor <= 0) { spawnMeteor(); nextMeteor = 1.4 + Math.random() * 2.4; }
       for (let i = meteors.length - 1; i >= 0; i--) {
@@ -410,28 +867,24 @@
         ctx.fillStyle = hg; ctx.fill();
       }
 
-      /* ── Spacecraft ── */
       shipT = (shipT + ORBIT_SPEED * dt) % 1;
       const eAnchorX = eX + eR * 0.55, eAnchorY = eY - eR * 0.55;
       const mAnchorX = mX, mAnchorY = mY + mR * 0.8;
       const ship = getShipPos(shipT, eAnchorX, eAnchorY, mAnchorX, mAnchorY);
-
-      /* engine trail */
       const prevShip = getShipPos((shipT - 0.012 + 1) % 1, eAnchorX, eAnchorY, mAnchorX, mAnchorY);
+
       const trailG = ctx.createLinearGradient(ship.x, ship.y, prevShip.x, prevShip.y);
       trailG.addColorStop(0, 'rgba(120,180,255,0.45)');
       trailG.addColorStop(1, 'rgba(80,140,255,0)');
       ctx.beginPath(); ctx.moveTo(ship.x, ship.y); ctx.lineTo(prevShip.x, prevShip.y);
       ctx.strokeStyle = trailG; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.stroke();
 
-      /* spacecraft body — proper rocket silhouette */
       const dx = ship.x - prevShip.x, dy = ship.y - prevShip.y;
       const angle = Math.atan2(dy, dx);
       ctx.save();
       ctx.translate(ship.x, ship.y);
       ctx.rotate(angle);
 
-      /* engine exhaust plume */
       const plume = ctx.createLinearGradient(-6, 0, -22, 0);
       plume.addColorStop(0,   'rgba(120,200,255,0.80)');
       plume.addColorStop(0.4, 'rgba(80,160,255,0.45)');
@@ -441,26 +894,21 @@
       ctx.closePath();
       ctx.fillStyle = plume; ctx.fill();
 
-      /* outer glow */
       const sg = ctx.createRadialGradient(0, 0, 0, 0, 0, 16);
       sg.addColorStop(0, 'rgba(160,220,255,0.22)');
       sg.addColorStop(1, 'rgba(80,140,255,0)');
       ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI*2);
       ctx.fillStyle = sg; ctx.fill();
 
-      /* main body — capsule */
       ctx.beginPath();
-      ctx.moveTo(10, 0);           /* nose tip */
-      ctx.bezierCurveTo(10, -3.5, 4, -5, -4, -5);  /* top curve */
-      ctx.lineTo(-6, -5);
-      ctx.lineTo(-6,  5);
-      ctx.lineTo(-4,  5);
-      ctx.bezierCurveTo(4, 5, 10, 3.5, 10, 0);     /* bottom curve */
+      ctx.moveTo(10, 0);
+      ctx.bezierCurveTo(10, -3.5, 4, -5, -4, -5);
+      ctx.lineTo(-6, -5); ctx.lineTo(-6, 5); ctx.lineTo(-4, 5);
+      ctx.bezierCurveTo(4, 5, 10, 3.5, 10, 0);
       ctx.closePath();
       ctx.fillStyle = '#ccd8ee'; ctx.fill();
       ctx.strokeStyle = 'rgba(180,210,255,0.5)'; ctx.lineWidth = 0.6; ctx.stroke();
 
-      /* nose cone — darker tip */
       ctx.beginPath();
       ctx.moveTo(10, 0);
       ctx.bezierCurveTo(10, -2.5, 7, -3.5, 4, -3.8);
@@ -469,31 +917,23 @@
       ctx.closePath();
       ctx.fillStyle = '#8aa8d0'; ctx.fill();
 
-      /* solar panel — top */
-      ctx.beginPath();
-      ctx.rect(-3, -11, 7, 5);
+      ctx.beginPath(); ctx.rect(-3, -11, 7, 5);
       ctx.fillStyle = '#2a5faa'; ctx.fill();
       ctx.strokeStyle = 'rgba(100,160,255,0.6)'; ctx.lineWidth = 0.5; ctx.stroke();
-      /* panel connector top */
       ctx.beginPath(); ctx.rect(-1, -6, 3, 1.5);
       ctx.fillStyle = '#888'; ctx.fill();
 
-      /* solar panel — bottom */
-      ctx.beginPath();
-      ctx.rect(-3, 6, 7, 5);
+      ctx.beginPath(); ctx.rect(-3, 6, 7, 5);
       ctx.fillStyle = '#2a5faa'; ctx.fill();
       ctx.strokeStyle = 'rgba(100,160,255,0.6)'; ctx.lineWidth = 0.5; ctx.stroke();
-      /* panel connector bottom */
       ctx.beginPath(); ctx.rect(-1, 4.5, 3, 1.5);
       ctx.fillStyle = '#888'; ctx.fill();
 
-      /* engine nozzle */
       ctx.beginPath();
       ctx.moveTo(-6, -3.5); ctx.lineTo(-10, -5); ctx.lineTo(-10, 5); ctx.lineTo(-6, 3.5);
       ctx.closePath();
       ctx.fillStyle = '#7a8aaa'; ctx.fill();
 
-      /* cockpit window */
       ctx.beginPath(); ctx.arc(5, 0, 2, 0, Math.PI*2);
       ctx.fillStyle = '#a0d8ff';
       ctx.shadowColor = '#60c0ff'; ctx.shadowBlur = 4;
@@ -501,7 +941,6 @@
       ctx.shadowBlur = 0;
 
       ctx.restore();
-
       requestAnimationFrame(draw);
     }
 
