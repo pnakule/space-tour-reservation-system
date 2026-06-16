@@ -300,7 +300,7 @@ export function renderExplore(entry = 'app') {
         <!-- Earth from Apollo 17 — public domain NASA image -->
         <img
           class="xp-hero-earth-img"
-          src="assests/earth.png"
+          src="assests/earth-view.png"
           alt="Earth from space"
         />
         <div class="xp-hero-overlay"></div>
