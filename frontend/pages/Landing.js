@@ -50,7 +50,7 @@ export function renderLanding() {
       }
       .l-hero-bg {
         position: absolute; inset: 0; z-index: 0;
-        background-image: url('assests/earth.png');
+        background-image: url('assests/earth-view.png');
         background-size: cover; background-position: center 35%;
         filter: brightness(1) saturate(1.2);
         animation: l-hero-bg-float 9s ease-in-out infinite;
