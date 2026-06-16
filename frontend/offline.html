@@ -329,6 +329,19 @@
       letter-spacing: -0.015em; line-height: 1.1;
       margin-bottom: 18px;
     }
+    .xp-hero-bg {
+      position: absolute;
+      inset: 0;
+
+      width: 100%;
+      height: 100%;
+
+      object-fit: cover;
+      object-position: center;
+
+      border-radius: 0;
+      z-index: 0;
+    }
     .xp-intro-text p {
       font-size: 0.95rem; line-height: 1.82;
       color: rgba(169,183,212,.85);
@@ -537,7 +550,7 @@
       <!-- Cinematic hero -->
       <div class="xp-hero">
         <div class="xp-hero-canvas"></div>
-        <img class="xp-fv-img" src="assests/earth-view.png">
+        <img class="xp-hero-bg" src="assests/earth-view.png">
         <div class="xp-hero-overlay"></div>
         <div class="xp-hero-content">
           <div class="xp-hero-eyebrow">
