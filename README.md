@@ -9,10 +9,10 @@ The application allows users to complete a multi-step space tour reservation pro
 ## Architecture Diagram
 
 ### PDF Version
-[reservation-architecture.pdf](reservation-architecture.pdf)
+[View Full Architecture Diagram (PDF)](Reservation-Architecture.pdf)
 
-### SVG Version
-![Architecture Diagram](architecture.svg)
+### Editiable svg
+![Architecture Diagram](reservation-architecture.svg)
 
 ---
 
