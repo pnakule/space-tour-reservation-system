@@ -4,6 +4,11 @@ A simple reservation application built to learn AWS services, serverless archite
 
 The application allows users to complete a multi-step space tour reservation process, receive a reservation ID, and get an email confirmation after the reservation is successfully created.
 
+## Live Demo
+
+Visit the application:
+
+https://www.elevateaws.com
 ---
 
 ## Architecture Diagram
