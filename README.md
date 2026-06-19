@@ -1,4 +1,4 @@
-# Space Tour Reservation System
+# 🚀 Space Tour Reservation System
 
 A simple reservation application built to learn AWS services, serverless architecture, and how applications can be deployed on AWS.
 
