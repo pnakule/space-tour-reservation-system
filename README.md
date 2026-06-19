@@ -31,6 +31,9 @@ The application allows users to complete a multi-step space tour reservation pro
 * Small architectural decisions can affect scalability, maintainability, and operational effort.
 * This project improved the way I think about designing, deploying, and operating cloud applications.
 
-
 ---
+
+## Still More to Learn
+
+There is still a lot more to learn, improve, and explore, and this project is one more step in that journey.
 
