@@ -5,10 +5,6 @@
 //
 //  Only ever invoked AFTER ConfirmReservation has
 //  successfully written the reservation to DynamoDB.
-//
-//  Theme logic:
-//   "Earth Orbit"  → deep-space blue/indigo UI  (default)
-//   "Lunar Flyby"  → premium silver/pearl moon UI
 // =====================================================
 const { SESClient, SendEmailCommand } = require('@aws-sdk/client-ses');
 const ses  = new SESClient({ region: process.env.AWS_REGION || 'us-east-1' });
@@ -105,7 +101,6 @@ function resolveTheme(experience = '') {
     journeyBody:   '#8b8fa8',
     footerText:    '#3a4258',
     footerLink:    '#555a70',
-    tagline:       'Your journey beyond Earth begins here.',
   };
 }
 
@@ -214,7 +209,7 @@ function buildHtml({ fullName, reservationId, mission }) {
       text-align:center;
     ">
       <p style="font-size:1rem;font-weight:700;color:${t.journeyHead};letter-spacing:-0.01em;margin:0 0 8px">
-       ✨ Never lose your sense of wonder. ${t.tagline}
+       ✨ Never lose your sense of wonder.
       </p>
       <p style="font-size:0.85rem;color:${t.journeyBody};line-height:1.7;margin:0">
         This confirmation was generated for demonstration purposes and does not represent a real spaceflight reservation.
@@ -265,8 +260,6 @@ Est. Availability: ${mission.availability || '—'}
 
 ──────────────────────────────────────
 ${resolveTheme(mission.experience).tagline}
-
-✨ The future is built by those who dare to imagine it.
 This confirmation was generated for demonstration purposes and does not represent a real spaceflight reservation.
 ──────────────────────────────────────
 https://github.com/pnakule/space-tour-reservation-system
