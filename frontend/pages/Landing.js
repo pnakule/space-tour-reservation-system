@@ -242,7 +242,7 @@ export function renderLanding() {
       <nav class="l-nav">
         <div class="l-logo">
           <div class="l-logo-ring"></div>
-          Space Tour
+          Shubham
         </div>
       </nav>
 
